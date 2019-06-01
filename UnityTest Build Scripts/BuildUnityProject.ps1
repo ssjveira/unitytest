@@ -3,9 +3,12 @@ $BuildOutputPath = "C:\Github\unitytest\UnityTest"
 $WinLogPath = "$env:LOCALAPPDATA\Unity\Editor\Editor.log"
 
 # Invoke the Unity Editor in order to build the Unity project
-Start-Process -FilePath $UnityPath -NoNewWindow -Wait -ArgumentList "-projectPath $BuildOutputPath -quit -batchMode -executeMethod BuildUtils.CreateBuildWin64"
+Write-Host "Starting Unity Build from Powershell..."
+$unityEditor = Start-Process -FilePath $UnityPath -NoNewWindow -Wait -ArgumentList "-projectPath $BuildOutputPath -quit -batchMode -executeMethod BuildUtils.CreateBuildWin64"
+Wait-Process $unityEditor.Id
+Write-Host "Finished Unity Build invoked from Powershell."
 
-# Dump Unity log to console (TODO: Get a little bit of the log at a time while polling the state of the process to see if it's still running or not)
+# Dump Unity log to console
 Get-Content $WinLogPath
 
 # COMMENT THIS OUT WHEN RUNNING ON BUILD SERVER
