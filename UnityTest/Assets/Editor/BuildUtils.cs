@@ -55,9 +55,20 @@ public class BuildUtils : MonoBehaviour
         return buildOutputPath + "Builds/" + target.ToString() + "/" + GetLongBuildName(target, buildName);
     }
 
-    private static void BuildAssetBundles(string buildPath, BuildTarget target, bool v1, bool v2, bool v3)
+    private static void BuildAssetBundles(BuildTarget target)
     {
-        throw new NotImplementedException();
+        string assetBundleDirectory = Path.Combine(Application.streamingAssetsPath, "AssetBundles");
+
+        if (!Directory.Exists(assetBundleDirectory))    
+            Directory.CreateDirectory(assetBundleDirectory);
+    
+        BuildPipeline.BuildAssetBundles(assetBundleDirectory, BuildAssetBundleOptions.None, target);
+    }
+    
+    [MenuItem("BuildUtils/BuildSystem/Win64/Build AssetBundles")]
+    public static void BuildAssetBundlesWin64()
+    {
+        BuildAssetBundles(BuildTarget.StandaloneWindows64);
     }
 
     private static UnityEditor.Build.Reporting.BuildReport BuildGame(string buildPath, string executableName, BuildTarget target, BuildOptions opts, string buildId, bool il2cpp)
@@ -147,16 +158,10 @@ public class BuildUtils : MonoBehaviour
         var buildPath = GetBuildPath(target, buildName);
         string executableName = Application.productName + ".exe";
 
-        Directory.CreateDirectory(buildPath);
+        if (!Directory.Exists(buildPath))
+            Directory.CreateDirectory(buildPath);
 
-        /* TODO: Finish implementing this so that it does the following (similar to FPSSample project from Unity):
-         * 
-         * 1. Build assets uncompressed
-         * 2. Determine if we need to force a bundle rebuild
-         * 3. Go through "levels" and create asset bundles for each level
-         * 4. Go through separate assets and bundle those
-         */
-        //BuildAssetBundles(buildPath, target, true, true, true);
+        BuildAssetBundles(target);
 
         var result = BuildGame(buildPath, executableName, target, BuildOptions.None, buildName, false);
 
